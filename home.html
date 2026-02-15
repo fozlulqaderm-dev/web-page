@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>My Personal Web Page</title>
+  <link rel="stylesheet" href="home.css"> 
+
+</head>
+<body>
+  <h1>My Personal Web Page</h1>
+
+  <!-- Login Section -->
+  <div id="login-container">
+    <input type="password" id="password-input" placeholder="Enter View Password">
+    <button onclick="checkViewPassword()">Login (View)</button>
+     <input type="checkbox" onclick="togglePassword('password-input')"> Show
+
+    <br><br>
+    <input type="password" id="update-password-input" placeholder="Enter Update Password">
+    <button onclick="checkUpdatePassword()">Login (Update)</button>
+      <input type="checkbox" onclick="togglePassword('update-password-input')"> Show
+  </div>
+
+  <!-- Search Section -->
+  <div id="search-box" style="display:none;">
+    <input type="text" id="search-input" placeholder="month write... Example: january">
+    <button onclick="searchNotes()">🔍 search</button>
+    <div id="search-results"></div>
+  </div>
+
+<script>
+
+  const months = [
+    { name: "january", days: 31 }, { name: "february", days: 28 },
+    { name: "march", days: 31 }, { name: "april", days: 30 },
+    { name: "may", days: 31 }, { name: "june", days: 30 },
+    { name: "july", days: 31 }, { name: "august", days: 31 },
+    { name: "september", days: 30 }, { name: "october", days: 31 },
+    { name: "november", days: 30 }, { name: "december", days: 31 }
+  ];
+
+   const viewPassword = "2026";
+  let updatePassword = "mypage2026";
+
+  let canUpdate = false;
+  let canView = false;
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    if (input.type === "password") {
+      input.type = "text";
+    } else {
+      inputField.type = "password";
+    }
+  } 
+
+  // ভিউ লগইন
+  function checkViewPassword() {
+    const input = document.getElementById("password-input").value;
+    if (input === viewPassword) {
+      canView = true;
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("search-box").style.display = "block";
+      alert("👀 view mode is now enabled!");
+    } else {
+      alert("❌ Invalid view password!");
+    }
+  }
+
+  // আপডেট লগইন
+  function checkUpdatePassword() {
+    const input = document.getElementById("update-password-input").value;
+    if (input === updatePassword) {
+      canUpdate = true;
+      document.getElementById("login-container").style.display = "none";
+      document.getElementById("search-box").style.display = "block";
+      alert("✅ Update mode is now enabled!");
+    } else {
+      alert("❌ Invalid update password!");
+    }
+  }
+
+  // মাস সার্চ করে পুরো মাসের নোট দেখানো
+  function searchNotes() {
+    const query = document.getElementById("search-input").value.toLowerCase();
+    const resultsDiv = document.getElementById("search-results");
+    resultsDiv.innerHTML = "";
+
+    const monthNames = months.map(m => m.name);
+    let monthIndex = monthNames.findIndex(m => m === query);
+
+    if (monthIndex === -1) {
+      resultsDiv.innerHTML = "❌ Invalid month name!";
+      return;
+    }
+
+    resultsDiv.innerHTML = `<b>📅 ${months[monthIndex].name} মাসের সব নোট:</b><br>`;
+
+    for (let d = 1; d <= months[monthIndex].days; d++) {
+       resultsDiv.innerHTML += `<div><b>${d}/${monthIndex+1}/2026 →</b></div>`;
+    
+for (let s = 1; s <= 5; s++) {
+
+      let dateKey = `note-2026-${monthIndex+1}-${d}`;
+      let savedText = localStorage.getItem(dateKey) || "";
+      let disabledAttr = canUpdate ? "" : "disabled";
+
+      resultsDiv.innerHTML += `
+        <div style="margin-left:20px;">
+          সিরিয়াল ${s}:
+         <input type="text" id="input-${dateKey}" class="note-input"
+            value="${savedText}" ${disabledAttr}>
+        </div>
+      `;
+    }
+    }
+
+    // আপডেট মোডে Save বোতাম দেখানো হবে
+    if (canUpdate) {
+      resultsDiv.innerHTML += `<button id="save-btn" onclick="saveNotes(${monthIndex})">💾 Save</button>`;
+    }
+  }
+
+  // Save ফাংশন
+  function saveNotes(monthIndex) {
+    for (let d = 1; d <= months[monthIndex].days; d++) {
+        for (let s = 1; s <= 5; s++) {
+      let dateKey = `note-2026-${monthIndex+1}-${d}`;
+      let inputField = document.getElementById(`input-${dateKey}`);
+      if (inputField) {
+        localStorage.setItem(dateKey, inputField.value);
+
+         // ✅ আইকন দেখানো
+        let checkSpanId = `check-${dateKey}`;
+        let existingSpan = document.getElementById(checkSpanId);
+        if (!existingSpan) {
+          let span = document.createElement("span");
+          span.id = checkSpanId;
+          span.textContent = " ✅";
+          inputField.insertAdjacentElement("afterend", span);
+        }
+      }
+      }
+    }
+    alert("✅ Notes saved successfully!");
+  }
+</script>
+</body>
+</html>
